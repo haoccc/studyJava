@@ -1,6 +1,7 @@
 package study.example;
 
 import java.util.IllegalFormatCodePointException;
+import java.util.Random;
 
 public class TestPC {
     public static void main(String[] args) {
@@ -9,6 +10,12 @@ public class TestPC {
         new Product(synContainer).start();
         new Consumer(synContainer).start();
         new Consumer(synContainer).start();
+        new Product(synContainer).start();
+        new Product(synContainer).start();
+        new Consumer(synContainer).start();
+        new Consumer(synContainer).start();
+
+
     }
 }
 
@@ -25,7 +32,7 @@ class Product extends Thread{
 
     @Override
     public void run() {
-        for (; i<100; ){
+        while (i<100){
             try {
                 product(i++);
             } catch (InterruptedException e) {
@@ -53,6 +60,7 @@ class Consumer extends Thread{
     public void run() {
         for (; i<100; ){
             try {
+//                this.sleep(Random);
                 cos(i++);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -80,6 +88,8 @@ class Chicken{
 class SynContainer{
     Chicken[] chickens = new Chicken[10];
     int count = 0;
+    Random random = new Random();
+
 
     public synchronized void push(int i) throws InterruptedException {
         while (count == chickens.length){
@@ -91,6 +101,7 @@ class SynContainer{
         System.out.println("生-----" + i + "-----只鸡");
         chickens[count] = chicken;
         count ++;
+        Thread.sleep(random.nextInt(200));
         this.notifyAll();
 
     }
