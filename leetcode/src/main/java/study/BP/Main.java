@@ -1,22 +1,13 @@
 package study.BP;
 
-import java.util.Arrays;
-
-public class main {
+public class Main {
     public static void main(String[] args) {
-//        int n = 4;
-//        System.out.println(climbStairs(n));;
-
-//        int[][] a = {{0, 0, 0}, {0, 1, 0}, {0, 0, 0}};
-//        int[][] a = {{1, 0}};
-//        uniquePathsWithObstacles(a);
-
-//        int a = 5;
-//        numTrees(a);
-
-//        int[] a = {1, 5, 5, 11, 2, 4, 1, 3};
-        int[] a = {100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,99,97};
-        System.out.println(canPartition(a));;
+//        int[] a = {2,7,4,1,8,1};
+//        System.out.println(lastStoneWeightII(a));
+//        int[] a = {1,0};
+//        int[] a = {1,1,1,1,1};
+        int[] a = {1};
+        System.out.println("result: " + findTargetSumWays(a, 1));
     }
 
     /**
@@ -248,11 +239,12 @@ public class main {
                     list[i][j] = list[i-1][j];
                 } else {
                     // 当前容量大于重量，比较前一状态 和 当前容量-当前重量状态 的 最大值
-                    list[i][j] = Math.max(list[j-nums[i-1]][j], list[i-1][j]);
+                    list[i][j] = Math.max(list[i-1][j], list[i-1][j-nums[i-1]] + nums[i-1]);
                 }
             }
         }
-        return false;
+        boolean result = list[list.length-1][sum] == sum;
+        return result;
 
 
 
@@ -269,8 +261,37 @@ public class main {
     }
 
     /**
+     * 滚动数组：分割等和子集：一维数组优化
+     * @param nums
+     * @return
+     */
+    public static boolean canPartition2(int[] nums) {
+        if(nums == null || nums.length == 0) return false;
+        int n = nums.length;
+        int sum = 0;
+        for(int num : nums) {
+            sum += num;
+        }
+        //总和为奇数，不能平分
+        if(sum % 2 != 0) return false;
+        int target = sum / 2;
+        int[] dp = new int[target + 1];
+        for(int i = 0; i < n; i++) {
+            for(int j = target; j >= nums[i]; j--) {
+                //物品 i 的重量是 nums[i]，其价值也是 nums[i]
+                dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);
+            }
+
+            //剪枝一下，每一次完成內層的for-loop，立即檢查是否dp[target] == target，優化時間複雜度（26ms -> 20ms）
+            if(dp[target] == target)
+                return true;
+        }
+        return dp[target] == target;
+    }
+
+    /**
      * 回溯回超时
-     * @param sum
+     * @param sum 综合
      * @param start
      * @param nums
      * @param target
@@ -290,4 +311,104 @@ public class main {
         return result;
     }
 
+
+    /**
+     * 1049. 最后一块石头的重量 II 滚动数组
+     * @param stones
+     * @return
+     */
+    public static int lastStoneWeightII(int[] stones) {
+        int sum = 0;
+        for (int stone : stones) {
+            sum += stone;
+        }
+        int total = sum;
+        sum = sum / 2;
+        int[] target = new int[sum+1];
+        for (int i = 0; i < stones.length; i++) {      // 石头重量
+            for (int j = sum; j >= stones[i]; j--) {    // 容量
+                // todo 这里是target[j] 不是j-i
+                target[j] = Math.max(target[j], target[j-stones[i]] + stones[i]);
+            }
+        }
+        return total - 2 * target[sum];
+    }
+
+    /**
+     * 494. 目标和
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static int findTargetSumWays(int[] nums, int target) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        int left = sum + target;
+        if (left % 2 != 0) return 0;
+        if (Math.abs(target) > sum) return 0;
+        left = left >> 1;
+
+        int[][] list = new int[nums.length][left+1];
+
+        // 初始化第一行
+        if (nums[0] <= left) list[0][nums[0]] = 1;
+
+        // 初始化第一列
+        int countZero = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) countZero++;
+            list[i][0] = (int) Math.pow(2, countZero);
+        }
+
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = 1; j < left+1; j++) {
+                if (j<nums[i]){
+                    list[i][j] = list[i-1][j];
+                } else {
+                    // 取当前值 和不取当前值 两种情况
+                    list[i][j] = list[i-1][j] + list[i-1][j-nums[i]];
+                }
+            }
+        }
+        return list[nums.length-1][left];
+
+    }
+
+
+    /**
+     * 494. 目标和 滚动数组
+     * todo 不太懂
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static int findTargetSumWays2(int[] nums, int target) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        int left = sum + target;
+        if (left % 2 != 0) return 0;
+        if (Math.abs(target) > sum) return 0;
+        left = left >> 1;
+
+        int[]  list = new int[left+1];
+
+        // 初始化第一行
+        list[0] = 1;
+
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = left; j >= nums[i]; j--) {
+                // 取当前值 和不取当前值 两种情况
+                list[j] = list[j] + list[j-nums[i]];
+            }
+        }
+        return list[left];
+    }
 }
+
+
+
+

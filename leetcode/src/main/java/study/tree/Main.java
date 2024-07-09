@@ -3,7 +3,7 @@ package study.tree;
 
 import java.util.*;
 
-public class main {
+public class Main {
     public static void main(String[] args) {
         TreeNode left = new TreeNode(9);
         TreeNode right = new TreeNode(20, new TreeNode(15), new TreeNode(7));
