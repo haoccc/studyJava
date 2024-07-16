@@ -1,14 +1,9 @@
 package study.BP;
 
+import java.util.Arrays;
+import java.util.SortedMap;
+
 public class Main {
-    public static void main(String[] args) {
-//        int[] a = {2,7,4,1,8,1};
-//        System.out.println(lastStoneWeightII(a));
-//        int[] a = {1,0};
-//        int[] a = {1,1,1,1,1};
-        int[] a = {1};
-        System.out.println("result: " + findTargetSumWays(a, 1));
-    }
 
     /**
      * 509. 斐波那契数
@@ -407,6 +402,123 @@ public class Main {
         }
         return list[left];
     }
+
+    /**
+     * 518. 零钱兑换 II
+     * @param amount
+     * @param coins
+     * @return
+     */
+    public static int change(int amount, int[] coins) {
+        int[] dp = new int[amount+1];
+        dp[0] = 1;
+
+        /**
+         * 先物品再背包
+         */
+        for (int i = 0; i<coins.length; i++){
+            for (int j=coins[i]; j <= amount; j++){
+                dp[j] += dp[j-coins[i]];
+            }
+        }
+//        /**
+//         * 先背包再物品 ×
+//         * 会重复计算，是排列问题
+//         */
+//        for (int i = 1; i<=amount; i++){
+//            for (int j=0; j < coins.length; j++){
+//                if (coins[j] <= i){
+//                    dp[i] += dp[i-coins[j]];
+//                }
+//            }
+//        }
+
+        return dp[amount];
+    }
+
+    /**
+     * 377. 组合总和 Ⅳ
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static int combinationSum4(int[] nums, int target) {
+        int[] dp = new int[target+1];
+        dp[0] = 1;
+        for (int i=0; i<=target; i++){
+            for (int j=0; j<nums.length; j++){
+                if (i >= nums[j]){
+                    dp[i] += dp[i-nums[j]];
+                }
+            }
+        }
+        return dp[target];
+    }
+
+    /**
+     * 322. 零钱兑换
+     * @param coins
+     * @param amount
+     * @return
+     */
+    public static int coinChange(int[] coins, int amount) {
+        if (amount==0) return 0;
+        int[] dp = new int[amount+1];
+        Arrays.fill(dp, amount+1);
+//        dp[0] = 1;
+        for (int coin : coins) {
+            if (coin <= amount){
+                dp[coin] = 1;
+            }
+
+        }
+
+        for (int i=0; i<=amount; i++){
+            for (int j=0; j<coins.length; j++){
+                if (coins[j] <= i){
+                    dp[i] = Math.min(dp[i], dp[i-coins[j]] + 1);
+                }
+            }
+        }
+        if (dp[amount] == amount + 1) return -1;
+        else return dp[amount];
+    }
+
+    /**
+     * 279. 完全平方数
+     * @param n
+     * @return
+     */
+    public static int numSquares(int n) {
+        int x = (int) Math.sqrt((double) n);
+        int[] dp = new int[n + 1];
+        Arrays.fill(dp, n + 1);
+//        for (int i = 0; i <= x; i++) {
+//            dp[i * i] = 1;
+//        }
+        dp[0] = 0;
+
+        for (int i=0; i<=n; i++){
+            for (int j=1; j * j<=i; j++){ // todo 逻辑好
+                dp[i] = Math.min(dp[i], dp[i-j*j]+1);
+            }
+        }
+        return dp[n];
+    }
+
+    public static void main(String[] args) {
+        int n = 13;
+        System.out.println(numSquares(n));
+//        int amount = 0;
+//        int[] coins = {1};
+////        int[] coins = {1, 2, 5};
+//        System.out.println(coinChange(coins, amount));
+
+    }
+
+
+
+
 }
 
 
