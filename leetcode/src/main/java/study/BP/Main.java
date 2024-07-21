@@ -1,7 +1,7 @@
 package study.BP;
 
-import java.util.Arrays;
-import java.util.SortedMap;
+import javax.lang.model.element.NestingKind;
+import java.util.*;
 
 public class Main {
 
@@ -506,13 +506,113 @@ public class Main {
         return dp[n];
     }
 
+    /**
+     * 139. 单词拆分
+     * @param s
+     * @param wordDict
+     * @return
+     */
+    public static boolean wordBreak(String s, List<String> wordDict) {
+        /**
+         * 解决不了["car","ca","rs"], cars 的情况
+         * 所以需要用动态规划和溯源。
+         */
+//        for (int j = 0; j < s.length(); ) {
+//            int i = 0;
+//            for (; i < wordDict.size(); i++) {
+//                int end = wordDict.get(i).length()+j;
+//                if (end>s.length()) continue;     // 避免溢出
+//                String temp = s.substring(j, end);
+//                if (temp.equals(wordDict.get(i))){
+//                    j += wordDict.get(i).length();
+//                    break;
+//                }
+//            }
+//            if (i>=wordDict.size()) return false;
+//        }
+//        return true;
+
+        /**
+         * 动态规划
+         */
+        boolean[] bp = new boolean[s.length()+1];
+        Arrays.fill(bp, false);
+        bp[0] = true;
+
+        // 先遍历背包
+        for (int i = 1; i <= s.length(); i++) {     // 注意边界值 {“a”}, a 需要严格控制边界
+            for (int j = 0; j < wordDict.size(); j++) {
+                int curLength = wordDict.get(j).length();
+                if (i-1 + curLength > s.length()) continue;
+                boolean equals = s.substring(i - 1, curLength + i - 1).equals(wordDict.get(j));
+                bp[i-1 + curLength] = equals & bp[i-1] || bp[i-1 + curLength];
+            }
+        }
+        return bp[s.length()];
+    }
+
+    /**
+     * 198. 打家劫舍
+     * @param nums
+     * @return
+     */
+    public int rob(int[] nums) {
+        int[] bp = new int[nums.length + 2];
+        Arrays.fill(bp, 0);
+        for (int i = 0; i < nums.length; i++) {
+            int j = i + 2; // 在bp中的位置
+            bp[j] = Math.max(nums[i] + bp[j-2], bp[j-1]);
+        }
+        return bp[nums.length + 1];
+
+        /**
+         * 优化，当前的状态只依赖前两次的状态
+         */
+
+    }
+
+    /**
+     * 213. 打家劫舍 II
+     * @param nums
+     * @return
+     */
+    public int rob2(int[] nums) {
+        if (nums == null || nums.length == 0)
+            return 0;
+        int len = nums.length;
+        if (len == 1)
+            return nums[0];
+        return Math.max(robAction(nums, 0, len - 1), robAction(nums, 1, len));
+    }
+
+    int robAction(int[] nums, int start, int end) {
+        int x = 0, y = 0, z = 0;
+        for (int i = start; i < end; i++) {
+            y = z;
+            z = Math.max(y, x + nums[i]);
+            x = y;
+        }
+        return z;
+    }
+
+
     public static void main(String[] args) {
-        int n = 13;
-        System.out.println(numSquares(n));
-//        int amount = 0;
-//        int[] coins = {1};
-////        int[] coins = {1, 2, 5};
-//        System.out.println(coinChange(coins, amount));
+
+
+        int[] nums = {1};
+        System.out.println(rob2(nums));
+//        String s = "a";
+////        String s = "leetcode";
+//        List<String> wordDict = new ArrayList<>(List.of(new String[]{"a"}));
+////        List<String> wordDict = new ArrayList<>(List.of(new String[]{"leet", "code"}));
+//        System.out.println(wordBreak(s, wordDict));
+
+//        int n = 13;
+//        System.out.println(numSquares(n));
+////        int amount = 0;
+////        int[] coins = {1};
+//////        int[] coins = {1, 2, 5};
+////        System.out.println(coinChange(coins, amount));
 
     }
 
