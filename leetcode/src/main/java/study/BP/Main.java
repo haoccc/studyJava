@@ -576,7 +576,7 @@ public class Main {
      * @param nums
      * @return
      */
-    public int rob2(int[] nums) {
+    public static int rob2(int[] nums) {
         if (nums == null || nums.length == 0)
             return 0;
         int len = nums.length;
@@ -585,7 +585,7 @@ public class Main {
         return Math.max(robAction(nums, 0, len - 1), robAction(nums, 1, len));
     }
 
-    int robAction(int[] nums, int start, int end) {
+    static int robAction(int[] nums, int start, int end) {
         int x = 0, y = 0, z = 0;
         for (int i = start; i < end; i++) {
             y = z;
@@ -595,12 +595,194 @@ public class Main {
         return z;
     }
 
+    /**
+     * 121. 买卖股票的最佳时机
+     * 贪心算法; 动态规划；
+     * @param prices
+     * @return
+     */
+    public static int maxProfit(int[] prices) {
+/*        // 当前值-最小值 和 之前的最大差值进行比较
+        int mi = Integer.MAX_VALUE;
+        int result = 0;
+        for (int i = 0; i < prices.length; i++) {
+            mi = Math.min(prices[i], mi);
+            result = Math.max(result, prices[i] - mi);
+        }
+        return result;*/
+
+
+        /**
+         * 动态规划
+         * 实际上等于贪心算法
+         *  记录最小值
+         *  再和最小值相减，判断能否得到最大利润
+         */
+/*        int[][] dp = new int[2][prices.length];
+        dp[0][0] = -prices[0];
+        dp[1][0] = 0;
+
+        for (int i = 1; i < prices.length; i++) {
+            dp[0][i] = Math.max(-prices[i], dp[0][i-1]);
+            dp[1][i] = Math.max(dp[1][i-1], dp[0][i] + prices[i]);
+        }
+        return dp[1][prices.length-1];*/
+
+        /**
+         * 动态规划
+         * 优化成一维数组
+         */
+        int[] dp = new int[2];
+        dp[0] = -prices[0];
+        dp[1] = 0;
+
+        for (int i = 1; i < prices.length; i++) {
+            dp[0] = Math.max(-prices[i], dp[0]);
+            dp[1] = Math.max(dp[1], dp[0] + prices[i]);
+        }
+        return dp[1];
+
+
+    }
+
+    /**
+     * 122. 买卖股票的最佳时机 II
+     * 贪心算法；动态规划
+     * @param prices
+     * @return
+     */
+    public int maxProfit2(int[] prices) {
+/*        int sum = 0;
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i] > prices[i-1]) sum += prices[i] - prices[i-1];
+        }
+        return sum;*/
+
+        /**
+         * 动态规划
+         */
+        int[] dp = new int[2];
+        // 0表示持有，1表示卖出
+        dp[0] = -prices[0];
+        dp[1] = 0;
+        for(int i = 1; i <= prices.length; i++){
+            // 前一天持有; 既然不限制交易次数，那么再次买股票时，要加上之前的收益
+            dp[0] = Math.max(dp[0], dp[1] - prices[i-1]);
+            // 前一天卖出; 或当天卖出，当天卖出，得先持有
+            dp[1] = Math.max(dp[1], dp[0] + prices[i-1]);
+        }
+        return dp[1];
+    }
+
+    /**
+     * 123. 买卖股票的最佳时机 III
+     * 两段 贪心 超时
+     *
+     * @param prices
+     * @return
+     */
+    public static int maxProfit3(int[] prices) {
+        /**
+         * 两段贪心
+         */
+/*        // 当前值-最小值 和 之前的最大差值进行比较
+        int mi = Integer.MAX_VALUE;
+        int result = 0;
+        int sum = 0;
+        for (int i = 0; i < prices.length-1; i++) {
+            mi = Math.min(prices[i], mi);
+            result = Math.max(result, prices[i] - mi);
+            int mj = Integer.MAX_VALUE;
+            for (int j = i; j < prices.length; j++) {
+                mj = Math.min(prices[j], mj);
+                sum = Math.max(sum, prices[j] - mj + result);
+            }
+        }
+        return sum;*/
+
+/*        *//**
+         * 动态规划
+         *//*
+        int[][] dp = new int[4][prices.length];
+        dp[0][0] = -prices[0];
+        dp[1][0] = 0;
+        dp[2][0] = -prices[0];
+        int m = Integer.MIN_VALUE;
+        for (int i = 1; i < prices.length; i++) {
+            // 第一次交易等于之前的情况
+            // 剩余金额
+            dp[0][i] = Math.max(dp[0][i-1], -prices[i]);
+            // 最大收入
+            dp[1][i] = Math.max(dp[1][i-1], prices[i] + dp[0][i]);
+            // 第二次交易
+            // 持有金额： max(之前剩余最大金额（当前不买入）, 当前买入股票剩余金额)
+            dp[2][i] = Math.max(dp[2][i-1], -prices[i] + dp[1][i]);
+            dp[3][i] = Math.max(dp[3][i-1], prices[i] + dp[2][i]);
+        }
+        return dp[3][prices.length-1];
+*/
+        /**
+         * 动态规划：优化成一维数组
+         */
+        int[] dp = new int[4];
+        dp[0] = -prices[0];
+        dp[2] = -prices[0];
+        for (int i = 1; i < prices.length; i++) {
+            // 第一次交易等于之前的情况
+            // 剩余金额
+            dp[0] = Math.max(dp[0], -prices[i]);
+            // 最大收入
+            dp[1] = Math.max(dp[1], prices[i] + dp[0]);
+            // 第二次交易
+            // 持有金额： max(之前剩余最大金额（当前不买入）, 当前买入股票剩余金额)
+            dp[2] = Math.max(dp[2], -prices[i] + dp[1]);
+            dp[3] = Math.max(dp[3], prices[i] + dp[2]);
+        }
+        return dp[3];
+    }
+
+    /**
+     * 188. 买卖股票的最佳时机 IV
+     * 给你一个整数数组 prices 和一个整数 k ，其中 prices[i] 是某支给定的股票在第 i 天的价格。设计一个算法来计算你所能获取的最大利润。你最多可以完成 k 笔交易。也就是说，你最多可以买 k 次，卖 k 次。
+     * 注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+     * @param k
+     * @param prices
+     * @return
+     */
+    public static int maxProfitK(int k, int[] prices) {
+        int[] dp = new int[2 * k];
+        for (int i = 0; i < k; i++) {
+            dp[2 * i] = -prices[0];
+        }
+        for (int i = 1; i < prices.length; i++) {
+            for (int j = 0; j < k; j++) {
+                int x = j * 2; // 持有金额
+                int y = j * 2 + 1;  // 当前收入
+                int pre_income = 0;
+                if (y>2){
+                    pre_income = dp[y-2];
+                }
+
+                dp[x] = Math.max(dp[x], -prices[i] + pre_income);
+                dp[y] = Math.max(dp[y], prices[i] + dp[x]);
+            }
+        }
+        return dp[2 * k -1];
+    }
+
+
 
     public static void main(String[] args) {
+        int[] prices = {2, 4, 1};
+        int s = maxProfitK(2, prices);
+        System.out.println(s);
 
+//        int[] prices = {1,3,2,8,4,9};
+//        int s = maxProfit3(prices);
+//        System.out.println(s);
 
-        int[] nums = {1};
-        System.out.println(rob2(nums));
+//        int[] nums = {1};
+//        System.out.println(rob2(nums));
 //        String s = "a";
 ////        String s = "leetcode";
 //        List<String> wordDict = new ArrayList<>(List.of(new String[]{"a"}));
