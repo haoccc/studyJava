@@ -770,12 +770,303 @@ public class Main {
         return dp[2 * k -1];
     }
 
+    /**
+     * 309. 买卖股票的最佳时机含冷冻期
+     * @param prices
+     * @return
+     */
+    public static int maxProfitFreeze(int[] prices) {
+        int[] dp = new int[4];
+        dp[0] = -prices[0];
+        for (int i = 1; i < prices.length; i++) {
+            // 第一次交易等于之前的情况
+            // 剩余金额
+            dp[0] = Math.max(dp[0], -prices[i]);
+            // 最大收入
+            dp[1] = Math.max(dp[1], prices[i] + dp[0]);
+            // 第二次交易
+            // 持有金额： max(之前剩余最大金额（当前不买入）, 当前买入股票剩余金额)
+            dp[2] = Math.max(dp[2], -prices[i] + dp[1]);
+            dp[3] = Math.max(dp[3], prices[i] + dp[2]);
+        }
+        return dp[3];
+
+    }
+
+    /**
+     * 714. 买卖股票的最佳时机含手续费
+     * @param prices
+     * @param fee
+     * @return
+     */
+    public static int maxProfitFee(int[] prices, int fee) {
+        int minValue = prices[0];
+        int sum = 0;
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i] < minValue) minValue = prices[i];
+            if (prices[i] >= minValue && prices[i] <= minValue + fee){
+                continue;
+            }
+            if (prices[i] > minValue + fee) {
+                sum += prices[i] - minValue - fee;
+                minValue = prices[i] - fee;
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * 300. 最长递增子序列
+     * @param nums
+     * @return
+     */
+    public static int lengthOfLIS(int[] nums) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        int[] dp = new int[nums.length];
+        Arrays.fill(dp, 1);
+        int maxValue = 1;
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]){
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+                if (dp[i] >= maxValue) maxValue = dp[i];
+            }
+        }
+        return maxValue;
+    }
+
+    /**
+     * 674. 最长连续递增序列
+     * @param nums
+     * @return
+     */
+    public static int findLengthOfLCIS(int[] nums) {
+/*        if (nums.length == 0) {
+            return 0;
+        }
+        int[] dp = new int[nums.length];
+        Arrays.fill(dp, 1);
+        int maxValue = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > nums[i-1]){
+                dp[i] = dp[i-1] + 1;
+            }
+            if (dp[i] >= maxValue) maxValue = dp[i];
+
+        }
+        return maxValue;*/
+
+        /**
+         * 优化成一维
+         * 或者叫贪心算法
+         */
+        if (nums.length == 0) {
+            return 0;
+        }
+        int dp = 1;
+        int maxValue = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > nums[i-1]){
+                dp += 1;
+            } else {
+                dp = 1;
+            }
+            if (dp >= maxValue) maxValue = dp;
+
+        }
+        return maxValue;
+    }
+
+
+    /**
+     * 718. 最长重复子数组
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public int findLength(int[] nums1, int[] nums2) {
+        int[][] dp = new int[nums1.length][nums2.length];
+        for (int[] ints : dp) {
+            Arrays.fill(ints, 0);
+        }
+
+        int maxValue = 0;
+
+        for (int i = 0; i < nums1.length; i++) {
+            if (nums1[i] == nums2[0]){
+                dp[i][0] = 1;
+                maxValue = 1;
+            }
+        }
+        for (int i = 0; i < nums2.length; i++) {
+            if (nums2[i] == nums1[0]) {
+                dp[0][i] = 1;
+                maxValue = 1;
+            }
+        }
+//        if (nums1[0] == nums2[0]) dp[0][0] = 1;
+        for (int i = 1; i < nums1.length; i++) {
+            for (int j = 1; j < nums2.length; j++) {
+                if (nums1[i] == nums2[j]){
+                    dp[i][j] = Math.max(1, dp[i-1][j-1]+1);
+                }
+                if (dp[i][j] > maxValue) maxValue = dp[i][j];
+            }
+        }
+        return maxValue;
+    }
+
+    /**
+     * 1143. 最长公共子序列
+     * @param text1
+     * @param text2
+     * @return
+     */
+    public static int longestCommonSubsequence(String text1, String text2) {
+        int[][] dp = new int[text1.length()+1][text2.length()+1];
+//        int maxValue = 0;
+        for (int i = 0; i < text1.length(); i++) {
+            for (int j = 0; j < text2.length(); j++) {
+                if (text1.charAt(i) == text2.charAt(j)){
+                    dp[i+1][j+1] = dp[i][j] + 1;
+                } else {
+                    dp[i+1][j+1] = Math.max(dp[i][j+1], dp[i+1][j]);
+                }
+            }
+        }
+        return dp[text1.length()][text2.length()];
+    }
+
+
+    /**
+     * 1035. 不相交的线
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public int maxUncrossedLines(int[] nums1, int[] nums2) {
+        int[][] dp = new int[nums1.length+1][nums2.length+1];
+        for (int i = 0; i < nums1.length; i++) {
+            for (int j = 0; j < nums2.length; j++) {
+                if (nums1[i] == nums2[j]){
+                    dp[i+1][j+1] = dp[i][j]+1;
+                } else {
+                    dp[i+1][j+1] = Math.max(dp[i][j+1], dp[i+1][j]);
+                }
+            }
+        }
+        return dp[nums1.length][nums2.length];
+    }
+
+    /**
+     * 53. 最大子数组和
+     * @param nums
+     * @return
+     */
+    public int maxSubArray(int[] nums) {
+        /*// 贪心算法
+        int maxValue = Integer.MIN_VALUE;
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+            maxValue = Math.max(maxValue, sum);
+            if (sum<=0) {
+                sum = 0;
+            }
+        }
+        return maxValue;*/
+
+        // 动态规划
+        int dp = nums[0];
+        int maxValue = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            if (dp <=0 ){
+                dp = nums[i];
+            } else {
+                dp += + nums[i];
+            }
+            maxValue = Math.max(maxValue, dp);
+        }
+        return maxValue;
+    }
+
+    /**
+     * 392. 判断子序列
+     * @param s
+     * @param t
+     * @return
+     */
+    public static boolean isSubsequence(String s, String t) {
+
+        /*
+        // 暴力算法， 还可以使用双指针，这个方法近似双指针
+        int j = 0;
+        for (int i = 0; i < s.length(); i++) {
+            while (j<t.length()){
+                if (t.charAt(j) == s.charAt(i)){
+                    break;
+                }
+                j++;
+            }
+            if (j == t.length()) return false;
+            // 再加一次很重要
+            // 两个字符匹配之后 j++, 及时移动到下一个字符 避免 aaaaaa, bbaaa 输出 ture;
+            j++;
+        }
+        return true;*/
+
+
+        int[][] dp = new int[s.length()+1][t.length()+1];
+        for (int i = 0; i < s.length(); i++) {
+            for (int j = 0; j < t.length(); j++) {
+                if (s.charAt(i) == t.charAt(j)){
+                    dp[i+1][j+1] = dp[i][j] + 1;
+                }
+                else {
+                    dp[i+1][j+1] = dp[i+1][j];
+                }
+            }
+        }
+        return dp[s.length()][t.length()] == s.length();
+    }
+
+    /**
+     * 115. 不同的子序列
+     * @param s
+     * @param t
+     * @return
+     */
+    public static int numDistinct(String s, String t) {
+        int[][] dp = new int[t.length()+1][s.length()+1];
+        Arrays.fill(dp[0], 1);
+
+        for (int i = 0; i < t.length(); i++) {
+            for (int j = i; j < s.length(); j++) {
+                if (t.charAt(i) == s.charAt(j)){
+                    dp[i+1][j+1] = dp[i][j] + dp[i+1][j];
+                } else {
+                    dp[i+1][j+1] = dp[i+1][j];
+                }
+            }
+        }
+        return dp[t.length()][s.length()];
+    }
+
 
 
     public static void main(String[] args) {
-        int[] prices = {2, 4, 1};
-        int s = maxProfitK(2, prices);
-        System.out.println(s);
+//        int[] nums = {1,3,6,7,9,4,10,5,6};
+//        lengthOfLIS(nums);
+        String text1 = "babgbag";
+        String text2 = "bag";
+        numDistinct(text1, text2);
+//        int[] prices = {2, 4, 1};
+//        int s = maxProfitK(2, prices);
+//        System.out.println(s);
 
 //        int[] prices = {1,3,2,8,4,9};
 //        int s = maxProfit3(prices);
