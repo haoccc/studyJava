@@ -1057,13 +1057,138 @@ public class Main {
     }
 
 
+    /**
+     * 583. 两个字符串的删除操作
+     * 等同于最大相同子串
+     * @param word1
+     * @param word2
+     * @return
+     */
+    public int minDistance(String word1, String word2) {
+        int[][] dp = new int[word1.length()+1][word2.length()+1];
+        for (int[] ints : dp) {
+            Arrays.fill(ints, 0);
+        }
+        for (int i = 0; i < word1.length(); i++) {
+            for (int j = 0; j < word2.length(); j++) {
+                if (word1.charAt(i) == word2.charAt(j)){
+                    dp[i+1][j+1] = dp[i][j] + 1;
+                } else {
+                    dp[i+1][j+1] = Math.max(dp[i][j+1], dp[i+1][j]);
+                }
+            }
+        }
+
+        return word1.length()+word2.length()-2*dp[word1.length()][word2.length()];
+    }
+
+    /**
+     * 72. 编辑距离
+     * @param word1
+     * @param word2
+     * @return
+     */
+    public int minDistance2(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        // 初始化
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] =  i;
+        }
+        for (int j = 1; j <= n; j++) {
+            dp[0][j] = j;
+        }
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (word1.charAt(i) == word2.charAt(j)){
+                    dp[i+1][j+1] = dp[i][j];
+                } else {
+                    dp[i+1][j+1] = Math.min(dp[i][j+1], dp[i+1][j]);
+                    dp[i+1][j+1] = Math.min(dp[i][j], dp[i+1][j+1]) + 1;
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+
+    /**
+     * 647. 回文子串
+     * 遍历顺序很重要
+     * @param s
+     * @return
+     */
+    public int countSubstrings(String s) {
+        int len = s.length();
+        int[][] dp = new int[len][len];
+        int count = 0;
+
+        for (int i = len-1; i >= 0; i--) {
+            for (int j = i; j < len; j++) {
+                if (i==j){
+                    dp[i][j] = 1;
+                    count ++;
+                } else {
+                    if (s.charAt(i) == s.charAt(j)){
+                        if (i + 1 == j){
+                            dp[i][j] = 1;
+                            count ++;
+                        } else {
+                            if (dp[i+1][j-1] == 1){
+                                dp[i][j] = 1;
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+
+    /**
+     * 516. 最长回文子序列
+     * @param s
+     * @return
+     */
+    public static int longestPalindromeSubseq(String s) {
+        int len = s.length();
+        int[][] dp = new int[len][len];
+        int count = 1;
+        for (int i = len-1; i >= 0; i--) {
+            for (int j = i; j < len; j++) {
+                if (i == j) {
+                    dp[i][j] = 1;
+                }
+                else {
+                    if (s.charAt(i) == s.charAt(j)){
+                        if (i+1==j) {
+                            dp[i][j] = 2;
+                            count = Math.max(2, count);
+                        } else {
+                            dp[i][j] = dp[i+1][j-1] + 2;
+                            count = Math.max(dp[i][j], count);
+                        }
+                    }
+                    else {
+                        dp[i][j] = Math.max(dp[i+1][j], dp[i][j-1]);
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+
 
     public static void main(String[] args) {
+        String s = "bbbab";
+        longestPalindromeSubseq(s);
+
 //        int[] nums = {1,3,6,7,9,4,10,5,6};
-//        lengthOfLIS(nums);
-        String text1 = "babgbag";
-        String text2 = "bag";
-        numDistinct(text1, text2);
+//        lengthOfLIS(nums);?
 //        int[] prices = {2, 4, 1};
 //        int s = maxProfitK(2, prices);
 //        System.out.println(s);
