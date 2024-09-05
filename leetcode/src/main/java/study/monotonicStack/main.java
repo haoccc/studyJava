@@ -83,7 +83,7 @@ public class main {
         /**
          * 动态规划
          */
-/*        int[] leftMax = new int[height.length];
+        int[] leftMax = new int[height.length];
         int[] rightMax = new int[height.length];
         int len = height.length;
 
@@ -103,36 +103,59 @@ public class main {
             ans += Math.min(leftMax[i], rightMax[i]) - height[i];
 
         }
-        return ans;*/
+        return ans;
 
-        /**
-         * 单调栈
-         */
+    }
+
+
+    /**
+     * 柱状图中最大的矩形
+     * @param heights
+     * @return
+     */
+    public static int largestRectangleArea(int[] heights) {
+        int[] left = new int[heights.length];
+        int[] right = new int[heights.length];
 
         Deque<Integer> stock = new LinkedList<>();
         stock.push(0);
 
-        
-    }
+        left[0] = -1;
+        right[heights.length-1] = heights.length;
 
-    /**
-     * 84. 柱状图中最大的矩形
-     * @param heights
-     * @return
-     */
-    public int largestRectangleArea(int[] heights) {
-        int len = heights.length;
-        int[] leftVal = new int[len];
-        int[] rightVal = new int[len];
-
-        for (int i = 0; i < len; i++) {
-            
+        // 从左到右遍历
+        for (int i = 1; i < heights.length; i++) {
+            while (!stock.isEmpty() && heights[stock.peek()] >= heights[i]){
+                stock.pop();
+            }
+            left[i] = (stock.isEmpty() ? -1 : stock.peek());
+            stock.push(i);
         }
-        
+
+        // 从右到左遍历
+        stock.clear();
+        stock.push(heights.length-1);
+        for (int i = heights.length-2; i >= 0; i--) {
+            while (!stock.isEmpty() && heights[stock.peek()] > heights[i]){
+                right[i] = stock.pop();
+            }
+        right[i] = (stock.isEmpty() ? heights.length : stock.peek());
+            stock.push(i);
+        }
+        int max = 0;
+        for (int i = 0; i < heights.length; i++) {
+            max = Math.max(max, (right[i]-left[i] - 1) * heights[i]);
+        }
+        return max;
     }
+
 
     public static void main(String[] args) {
-        int[] temperatures = {1,2,1};
-        System.out.println(Arrays.toString(nextGreaterElements(temperatures)));;
+
+        int[] heights = {3,6,5,7,4,8,1,0};
+//        int[] heights = {2,1,5,6,2,3};
+        largestRectangleArea(heights);
+//        int[] temperatures = {1,2,1};
+//        System.out.println(Arrays.toString(nextGreaterElements(temperatures)));;
     }
 }
