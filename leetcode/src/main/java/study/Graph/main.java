@@ -93,15 +93,6 @@ public class main {
     }
 
 
-    /**
-     * 岛屿数量
-     * 深度优先
-     * @param grid
-     * @return
-     */
-    public static int numIslands(char[][] grid) {
-
-    }
 
     public static void main(String[] args) {
         char[][] grid = {{'1','1','0','0','0'},{'1','1','0','0','0'},{'0','0','1','0','0'},{'0','0','0','1','1'}};
