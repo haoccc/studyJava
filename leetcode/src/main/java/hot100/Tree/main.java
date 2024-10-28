@@ -222,6 +222,7 @@ public class main {
         TreeNode right = recursiveFlatten(root.right);
         TreeNode left = recursiveFlatten(root.left);
         root.right = left;
+        root.left = null;
         if (left == null) return root;
         while (left.right != null) left = left.right;
         left.right = right;
