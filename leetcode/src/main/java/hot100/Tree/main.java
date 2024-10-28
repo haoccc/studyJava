@@ -214,18 +214,20 @@ public class main {
      * @param root
      */
     public void flatten(TreeNode root) {
-        recursiveFlatten(root);
-    }
-
-    private TreeNode recursiveFlatten(TreeNode root){
-        if (root == null) return root;
-        TreeNode right = recursiveFlatten(root.right);
-        TreeNode left = recursiveFlatten(root.left);
-        root.right = left;
-        if (left == null) return root;
-        while (left.right != null) left = left.right;
-        left.right = right;
-        return root;
+        if (root == null) return;
+        while (root != null){
+            if (root.left == null) {
+                root = root.right;
+                continue;
+            }
+            TreeNode right = root.right;
+            root.right = root.left;
+            root.left = null;
+            TreeNode node = root.right;
+            while (node.right != null) node = node.right;
+            node.right = right;
+            root = root.right;
+        }
     }
 
     public static void main(String[] args) {
