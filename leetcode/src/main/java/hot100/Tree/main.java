@@ -4,6 +4,7 @@ import hot100.LinkList.ListNode;
 import study.tree.TreeNode;
 
 import javax.swing.*;
+import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.concurrent.RecursiveAction;
 
@@ -221,28 +222,62 @@ public class main {
         if (root == null) return root;
         TreeNode right = recursiveFlatten(root.right);
         TreeNode left = recursiveFlatten(root.left);
+        if (left == null) return root;
+
         root.right = left;
         root.left = null;
-        if (left == null) return root;
         while (left.right != null) left = left.right;
         left.right = right;
         return root;
     }
 
+    /**
+     * 105. 从前序与中序遍历序列构造二叉树
+     * @param preorder
+     * @param inorder
+     * @return
+     */
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        // 将preorder和inorder转化为list
+        List<Integer> preList = new ArrayList<>();
+        for (int i : preorder) preList.add(i);
+        List<Integer> inList = new ArrayList<>();
+        for (int i : inorder) inList.add(i);
+
+        return recursive(preList, inList);
+    }
+
+    private TreeNode recursive(List<Integer> preorder, List<Integer> inorder){
+        if (preorder.isEmpty() || inorder.isEmpty()) return null;
+
+        int middle = preorder.get(0);
+        int index = inorder.indexOf(middle);
+
+        TreeNode root = new TreeNode();
+        TreeNode left = recursive(preorder.subList(1, 1 + index), inorder.subList(0, index));
+        TreeNode right = recursive(preorder.subList(1 + index, preorder.size()), inorder.subList(index + 1, inorder.size()));
+        root.left = left;
+        root.right = right;
+        root.val = middle;
+        return root;
+    }
+
     public static void main(String[] args) {
         main main = new main();
-        TreeNode treeNode15 = new TreeNode(15);
-        TreeNode treeNode7 = new TreeNode(7);
-        TreeNode treeNode20 = new TreeNode(20);
-        treeNode20.left = treeNode15;
-        treeNode20.right = treeNode7;
 
-        TreeNode treeNode9 = new TreeNode(9);
-        TreeNode treeNode3 = new TreeNode(3);
-        treeNode3.left = treeNode9;
-        treeNode3.right = treeNode20;
-
-        TreeNode nullNode = null;
-        main.levelOrder(nullNode);
+        main.buildTree(new int[]{3, 9, 20, 15, 7}, new int[]{9, 3, 15, 20, 7});
+//        TreeNode treeNode15 = new TreeNode(15);
+//        TreeNode treeNode7 = new TreeNode(7);
+//        TreeNode treeNode20 = new TreeNode(20);
+//        treeNode20.left = treeNode15;
+//        treeNode20.right = treeNode7;
+//
+//        TreeNode treeNode9 = new TreeNode(9);
+//        TreeNode treeNode3 = new TreeNode(3);
+//        treeNode3.left = treeNode9;
+//        treeNode3.right = treeNode20;
+//
+//        TreeNode nullNode = null;
+//        main.levelOrder(nullNode);
     }
 }
